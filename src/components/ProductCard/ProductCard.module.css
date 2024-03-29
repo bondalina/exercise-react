@@ -1,0 +1,33 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid black;
+  border-radius: 10px;
+  padding: 20px 20px;
+  margin-bottom: 20px;
+  font-family: sans-serif;
+}
+.card.cardPromotional {
+  background-color: aqua;
+}
+.cardImg {
+  margin: 0 auto;
+  max-width: 450px;
+  margin-bottom: 20px;
+}
+.cardTitle {
+  border-top: 1px solid grey;
+  font-size: 38px;
+  margin: 0;
+}
+.cardPrice {
+  font-size: 20px;
+}
+.cardDiscription {
+  font-size: 18px;
+}
+.cardAddToBtn {
+  max-width: 450px;
+  margin: 0 auto;
+  font-size: 28px;
+}
