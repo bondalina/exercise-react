@@ -46,46 +46,60 @@ function App() {
   const [articles, setArticles] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-
-  // Робимо запит на дані якщо не треба чекати дій від користувача!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  // useEffect(() => {
-  //   async function getArticles() {
-  //     try {
-  //       setLoading(true);
-  //       const data = await FetchArticles('react');
-  //       setArticles(data);
-  //     } catch (error) {
-  //       setError(true);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   }
-  //   getArticles();
-  // }, []);
-  // Робимо запит на дані якщо не треба чекати дій від користувача!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  const [page, setPage] = useState(1);
+  const [query, setQuery] = useState('');
 
   // Якщо треба отримувати дані з бекенда після дій користувача(відправка форми)
   // використовуємо функцію в якій робимо запит на бекенд
   const handleSearch = async newQuery => {
-    // console.log(newQuery);
-    try {
-      setLoading(true);
-      const data = await FetchArticles(newQuery);
-      setArticles(data);
-    } catch (error) {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
+    // Зберігаємо новий термін пошуку:
+    setQuery(newQuery);
+    // Починаємо пошук з першої сторінки:
+    setPage(1);
+    // При пошуку нового артіклу очищуємо попередній масив артиклів
+    setArticles([]);
   };
+
+  const handleLoadMore = () => {
+    setPage(page + 1);
+  };
+
+  // useEffect(() => {}, []);
+
+  useEffect(() => {
+    // Щоб пропустити ефект монтування коли інпут порожній(щоб не відправлялись порожні
+    // запити) використовуємо наступний патерн:
+    if (query === '') {
+      return;
+    }
+    async function getArticles() {
+      try {
+        setLoading(true);
+        const data = await FetchArticles(query, page);
+        // Щоб додати артікли в кінець до списку вже існуючих використовуємо
+        // наступнаий патерн:
+        setArticles(prevArticles => {
+          return [...prevArticles, ...data];
+        });
+      } catch (error) {
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+    getArticles();
+  }, [page, query]);
 
   return (
     <div>
       <h1>HTTP запити</h1>
       <SearchForm onSearch={handleSearch} />
       {error && <b>Oops! Something go wrong</b>}
-      {isLoading && <p>Please wait...</p>}
       {articles.length > 0 && <ArticlesList items={articles} />}
+      {isLoading && <p>Please wait...</p>}
+      {articles.length > 0 && !isLoading && (
+        <button onClick={handleLoadMore}>Load more articles</button>
+      )}
       {/* <MailBox /> */}
       {/* <div style={hidenStyle} className={css.cardGrid}>
         {[...productData]
@@ -114,3 +128,20 @@ function App() {
 }
 
 export default App;
+
+// Робимо запит на дані якщо не треба чекати дій від користувача!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// useEffect(() => {
+//   async function getArticles() {
+//     try {
+//       setLoading(true);
+//       const data = await FetchArticles('react');
+//       setArticles(data);
+//     } catch (error) {
+//       setError(true);
+//     } finally {
+//       setLoading(false);
+//     }
+//   }
+//   getArticles();
+// }, []);
+// Робимо запит на дані якщо не треба чекати дій від користувача!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
